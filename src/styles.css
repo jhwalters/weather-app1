@@ -1,0 +1,52 @@
+body {
+    background: linear-gradient( #66c5ea 0%, #4b51a2 100%);
+    color: #fff;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
+.header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px;
+    
+}
+
+.location {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.location i {
+    font-size: 20px;
+    color: white;
+}
+
+.location h1 {
+    font-size: 24px;
+    margin: 0;
+    font-weight: normal;
+}
+
+.current-weather {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    flex-direction: column;
+}
+
+.current-weather img {
+    width: 100px;
+    height: 100px;
+}
+
+.current-weather h1 {
+    font-size: 64px;
+    margin: 10px 0 0 0;
+    font-weight: normal;
+}
