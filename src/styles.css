@@ -50,3 +50,47 @@ body {
     margin: 10px 0 0 0;
     font-weight: normal;
 }
+
+.forecast {
+    display: flex;
+    justify-content: center;
+    margin: 50px auto;
+    width: 70%;
+    background-color: #4b51a2;
+    border-radius: 10px;
+    flex-direction: column;
+}
+
+.forecast-title {
+    font-size: 24px;
+    padding-left: 20px;
+}
+
+.day h2 {
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.day {
+    display: flex;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+}
+
+.day h2 {
+    width: 30px;
+}
+
+.day img {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+}
+
+.temps {
+    display: flex;
+    gap: 10px;
+}
