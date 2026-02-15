@@ -4,7 +4,7 @@ body {
     font-family: sans-serif;
     margin: 0;
     padding: 0;
-    height: 100vh;
+    height: 100%;
 }
 
 .header {
@@ -51,19 +51,75 @@ body {
     font-weight: normal;
 }
 
+.hourly {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    background-color: #4b51a2;
+    width: 80%;
+    border-radius: 30px;
+    margin: 50px auto;
+    padding-bottom: 20px;
+}
+
+.hourly-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.hours {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 30px;
+    overflow: auto;
+    padding: 0 20px;
+}
+
+.hours h2 {
+    font-size: 18px;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+.hour {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hour img {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+}
+
 .forecast {
     display: flex;
     justify-content: center;
     margin: 50px auto;
-    width: 70%;
+    width: 80%;
     background-color: #4b51a2;
-    border-radius: 10px;
+    border-radius: 30px;
     flex-direction: column;
+    padding-bottom: 20px;
 }
 
 .forecast-title {
     font-size: 24px;
-    padding-left: 20px;
+    margin-left: 20px;
+    width: 100px;
+}
+
+.days {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
 }
 
 .day h2 {
@@ -74,14 +130,16 @@ body {
 .day {
     display: flex;
     flex-direction: row;
-    justify-content:space-around;
+    justify-content:space-between;
     align-items: center;
-    width: 100%;
-    gap: 10px;
+    width: 90%;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .day h2 {
-    width: 30px;
+    width: 60px;
+    text-align: center;
 }
 
 .day img {
@@ -92,5 +150,7 @@ body {
 
 .temps {
     display: flex;
+    justify-content: center;
     gap: 10px;
+    width: 90px;
 }
