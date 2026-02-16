@@ -60,7 +60,7 @@ body {
     width: 80%;
     border-radius: 30px;
     margin: 50px auto;
-    padding-bottom: 20px;
+    max-width: 330px;
 }
 
 .hourly-header {
@@ -106,7 +106,7 @@ body {
     background-color: #4b51a2;
     border-radius: 30px;
     flex-direction: column;
-    padding-bottom: 20px;
+    max-width: 330px;
 }
 
 .forecast-title {
@@ -153,4 +153,34 @@ body {
     justify-content: center;
     gap: 10px;
     width: 90px;
+}
+
+.small {
+    display: flex;
+    margin: auto;
+    width: 80%;
+    justify-content: space-between;
+    margin-bottom: 50px;
+    max-width: 330px;
+}
+
+.humidity, .wind {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45%;
+    background-color: #4b51a2;
+    border-radius: 30px;
+    flex-direction: column;
+}
+
+.humidity-info, .wind-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.humidity-info i, .wind-info i {
+    font-size: 25px;
+    color: white;
 }
