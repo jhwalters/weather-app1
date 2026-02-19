@@ -9,10 +9,11 @@ body {
 
 .header {
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin: auto;
     padding: 20px;
-    
+    max-width: 412px;
 }
 
 .location {
@@ -30,6 +31,22 @@ body {
     font-size: 24px;
     margin: 0;
     font-weight: normal;
+}
+
+.location-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.my-location-btn, .change-location-btn {
+    background-color: transparent;
+    border: 1px solid white;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
 }
 
 .current-weather {
@@ -61,6 +78,7 @@ body {
     border-radius: 30px;
     margin: 50px auto;
     max-width: 330px;
+    padding-bottom: 20px;
 }
 
 .hourly-header {
@@ -107,6 +125,7 @@ body {
     border-radius: 30px;
     flex-direction: column;
     max-width: 330px;
+    padding-bottom: 20px;
 }
 
 .forecast-title {
