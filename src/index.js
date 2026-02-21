@@ -6,6 +6,11 @@ const cityName = document.querySelector('.location h1');
 const currentTemp = document.querySelector('.current-temp');
 const currentConditionImg = document.querySelector('.current-weather img');
 const hourlyDate = document.querySelector('.hourly-date');
+const hoursContainer = document.querySelector('.hours');
+
+const hourHeader = document.createElement('h2');
+const hourIcon = document.createElement('img');
+const hourlyTemp = document.createElement('h3');
 
 myLocationBtn.addEventListener('click', getLocation);
 
@@ -60,9 +65,11 @@ function fetchWeatherData(city) {
             console.log(data);
             // Update the UI with weather data
             cityName.textContent = data.location.name;
-            currentTemp.textContent = `${data.current.temp_f}°`;
+            currentTemp.textContent = `${data.current.temp_f.toFixed(0)}°`;
             currentConditionImg.src = data.current.condition.icon;
             hourlyDate.textContent = getDate();
+            getHourlyData(city);
+
         })
         .catch(error => {
             console.error('Error fetching weather data:', error);
@@ -100,4 +107,50 @@ function getDate() {
         case 12:
             return `Dec, ${day} `;
     }
+}
+
+function getHourlyData(city) {
+    const apiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&aqi=no&alerts=no&days=1`;
+    const date = new Date();
+    const time = date.getHours();
+    console.log(`Current hour: ${time}`);
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            // Update the UI with hourly weather data
+            const hourlyData = data.forecast.forecastday[0].hour;
+            // You can loop through hourlyData to display it as needed
+            hoursContainer.innerHTML = ''; // Clear previous hour data
+            for (let i = time; i < hourlyData.length; i++) {
+                const hourContainer = document.createElement('div.hour');
+                const hour = hourlyData[i];
+                if (hour.time.split(' ')[1].slice(0, 2) >= 12) {
+                    hourContainer.innerHTML = `
+                        <h2>${hour.time.split(' ')[1].slice(0, 2) - 12} PM</h2>
+                        <img src="${hour.condition.icon}" alt="Weather Icon">
+                        <h3>${hour.temp_f.toFixed(0)}°</h3>
+                    `
+                } else {
+                    hourContainer.innerHTML = `
+                        <h2>${hour.time.split(' ')[1].slice(0, 2)} AM</h2>
+                        <img src="${hour.condition.icon}" alt="Weather Icon">
+                        <h3>${hour.temp_f.toFixed(0)}°</h3>
+                    `
+                }
+                // For example, you can update the hourlyTemp element with the first hour's temperature
+                
+                hourContainer.classList.add('hour');
+                
+                
+                // You can also create new elements for each hour and append them to the hourContainer
+                
+                hoursContainer.appendChild(hourContainer);
+            }
+
+        }
+    )
+    .catch(error => {
+        console.error('Error fetching hourly weather data:', error);
+    });
 }
