@@ -26,26 +26,11 @@ function getLocation() {
     }
 }
 
-function getCityName(lat, lon) {
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
-        .then(response => response.json())
-        .then(data => {
-            const city = data.address.city || data.address.town || data.address.village || "Unknown Location";
-            cityName.textContent = city;
-            console.log(`City Name: ${city}`);
-        })
-        .catch(error => {
-            console.error('Error fetching city name:', error);
-            cityName.textContent = "Unknown Location";
-        });
-}
-
 function showPosition(position) {
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
     cityName.textContent = `Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}`;
     console.log(`Latitude: ${lat}, Longitude: ${lon}`);
-    getCityName(lat, lon);
     fetchWeatherData(`${lat},${lon}`);
 }
 
@@ -74,6 +59,7 @@ function fetchWeatherData(city) {
         .then(data => {
             console.log(data);
             // Update the UI with weather data
+            cityName.textContent = data.location.name;
             currentTemp.textContent = `${data.current.temp_f}°`;
             currentConditionImg.src = data.current.condition.icon;
             hourlyDate.textContent = getDate();
