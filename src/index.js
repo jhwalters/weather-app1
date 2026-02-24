@@ -8,10 +8,6 @@ const currentConditionImg = document.querySelector('.current-weather img');
 const hourlyDate = document.querySelector('.hourly-date');
 const hoursContainer = document.querySelector('.hours');
 
-const hourHeader = document.createElement('h2');
-const hourIcon = document.createElement('img');
-const hourlyTemp = document.createElement('h3');
-
 myLocationBtn.addEventListener('click', getLocation);
 
 changeLocationBtn.addEventListener('click', () => {
@@ -69,6 +65,7 @@ function fetchWeatherData(city) {
             currentConditionImg.src = data.current.condition.icon;
             hourlyDate.textContent = getDate();
             getHourlyData(city);
+            getForecastData(city);
 
         })
         .catch(error => {
@@ -131,6 +128,13 @@ function getHourlyData(city) {
                         <img src="${hour.condition.icon}" alt="Weather Icon">
                         <h3>${hour.temp_f.toFixed(0)}°</h3>
                     `
+                } else if (hour.time.split(' ')[1].slice(0, 2) == 12) {
+                    hourContainer.innerHTML = `
+                        <h2>${hour.time.split(' ')[1].slice(0, 2)} PM</h2>
+                        <img src="${hour.condition.icon}" alt="Weather Icon">
+                        <h3>${hour.temp_f.toFixed(0)}°</h3>
+                    `
+                
                 } else {
                     hourContainer.innerHTML = `
                         <h2>${hour.time.split(' ')[1].slice(0, 2)} AM</h2>
@@ -138,13 +142,8 @@ function getHourlyData(city) {
                         <h3>${hour.temp_f.toFixed(0)}°</h3>
                     `
                 }
-                // For example, you can update the hourlyTemp element with the first hour's temperature
                 
-                hourContainer.classList.add('hour');
-                
-                
-                // You can also create new elements for each hour and append them to the hourContainer
-                
+                hourContainer.classList.add('hour');                
                 hoursContainer.appendChild(hourContainer);
             }
 
@@ -153,4 +152,39 @@ function getHourlyData(city) {
     .catch(error => {
         console.error('Error fetching hourly weather data:', error);
     });
+}
+
+function getForecastData(city) {
+    const apiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&aqi=no&alerts=no&days=7`;
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            // Update the UI with forecast weather data
+            const forecastData = data.forecast.forecastday;
+            const daysOfTheWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            console.log(forecastData);
+            // You can loop through forecastData to display it as needed
+            const forecastContainer = document.querySelector('.days');
+            forecastContainer.innerHTML = ''; // Clear previous forecast data
+            forecastData.forEach(day => {
+                const dayContainer = document.createElement('div');
+                const date = new Date(day.date);
+                    dayContainer.classList.add('day');
+                    dayContainer.innerHTML = `
+                        <h2>${
+                            daysOfTheWeek[date.getDay() + 1]
+                        }</h2>
+                        <img src="${day.day.condition.icon}" alt="Weather Icon">
+                        <div class="temps">
+                            <h3>${day.day.maxtemp_f.toFixed(0)}°</h3>
+                            <h3>${day.day.mintemp_f.toFixed(0)}°</h3>
+                        </div>
+                    `;
+                    forecastContainer.appendChild(dayContainer);
+                }
+        )})
+        .catch(error => {
+            console.error('Error fetching forecast weather data:', error);
+        });
 }
