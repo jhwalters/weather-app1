@@ -67,6 +67,7 @@ function fetchWeatherData(city) {
             getHourlyData(city);
             getForecastData(city);
             getHumidity(city);
+            getWindSpeed(city);
 
         })
         .catch(error => {
@@ -203,5 +204,21 @@ function getHumidity(city) {
         })
         .catch(error => {
             console.error('Error fetching humidity data:', error);
+        });
+}
+
+function getWindSpeed(city) {
+    const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=no`;
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            // Update the UI with wind speed data
+            const windSpeed = data.current.wind_mph.toFixed(0);
+            const windSpeedContainer = document.querySelector('.wind-info h3');
+            windSpeedContainer.textContent = `${windSpeed} mph`;
+        })
+        .catch(error => {
+            console.error('Error fetching wind speed data:', error);
         });
 }
