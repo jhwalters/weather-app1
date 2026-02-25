@@ -66,6 +66,7 @@ function fetchWeatherData(city) {
             hourlyDate.textContent = getDate();
             getHourlyData(city);
             getForecastData(city);
+            getHumidity(city);
 
         })
         .catch(error => {
@@ -122,7 +123,7 @@ function getHourlyData(city) {
             for (let i = time; i < hourlyData.length; i++) {
                 const hourContainer = document.createElement('div.hour');
                 const hour = hourlyData[i];
-                if (hour.time.split(' ')[1].slice(0, 2) >= 12) {
+                if (hour.time.split(' ')[1].slice(0, 2) > 12) {
                     hourContainer.innerHTML = `
                         <h2>${hour.time.split(' ')[1].slice(0, 2) - 12} PM</h2>
                         <img src="${hour.condition.icon}" alt="Weather Icon">
@@ -186,5 +187,21 @@ function getForecastData(city) {
         )})
         .catch(error => {
             console.error('Error fetching forecast weather data:', error);
+        });
+}
+
+function getHumidity(city) {
+    const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=no`;
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            // Update the UI with humidity data
+            const humidity = data.current.humidity;
+            const humidityContainer = document.querySelector('.humidity-info h3');
+            humidityContainer.textContent = `${humidity}%`;
+        })
+        .catch(error => {
+            console.error('Error fetching humidity data:', error);
         });
 }
