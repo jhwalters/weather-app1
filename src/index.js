@@ -7,6 +7,9 @@ const currentTemp = document.querySelector('.current-temp');
 const currentConditionImg = document.querySelector('.current-weather img');
 const hourlyDate = document.querySelector('.hourly-date');
 const hoursContainer = document.querySelector('.hours');
+const forecastContainer = document.querySelector('.days');
+const humidityContainer = document.querySelector('.humidity-info h3');
+const windSpeedContainer = document.querySelector('.wind-info h3');
 
 myLocationBtn.addEventListener('click', getLocation);
 
@@ -34,174 +37,88 @@ function handleLocationError(error) {
 }
 
 async function fetchWeatherData(city) {
-    const currentUrl = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${query}&aqi=no`;
-    const forecastUrl = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${query}&days=7&aqi=no&alerts=no`;
-    const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=no
-`;
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            // Update the UI with weather data
-            cityName.textContent = data.location.name;
-            currentTemp.textContent = `${data.current.temp_f.toFixed(0)}°`;
-            currentConditionImg.src = data.current.condition.icon;
-            hourlyDate.textContent = getDate();
-            getHourlyData(city);
-            getForecastData(city);
-            getHumidity(city);
-            getWindSpeed(city);
+    try {
+        const currentUrl = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=no`;
+        const forecastUrl = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&days=7&aqi=no&alerts=no`;
 
-        })
-        .catch(error => {
-            console.error('Error fetching weather data:', error);
-        });
-}
+        const [currentRes, forecastRes] = await Promise.all([
+            fetch(currentUrl),
+            fetch(forecastUrl)
+        ]);
 
-function getDate() {
-    const date = new Date();
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
+        const currentData = await currentRes.json();
+        const forecastData = await forecastRes.json();
 
-    switch (month) {
-        case 1:
-            return `Jan, ${day} `;
-        case 2:
-            return `Feb, ${day} `;
-        case 3:
-            return `Mar, ${day} `;
-        case 4:
-            return `Apr, ${day} `;
-        case 5:
-            return `May, ${day} `;
-        case 6:
-            return `Jun, ${day} `;
-        case 7:
-            return `Jul, ${day} `;
-        case 8:
-            return `Aug, ${day} `;
-        case 9:
-            return `Sep, ${day} `;
-        case 10:
-            return `Oct, ${day} `;
-        case 11:
-            return `Nov, ${day} `;
-        case 12:
-            return `Dec, ${day} `;
+        updateCurrentWeather(currentData);
+        updateHourlyWeather(forecastData);
+        updateForecast(forecastData);
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
     }
 }
 
-function getHourlyData(city) {
-    const apiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&aqi=no&alerts=no&days=1`;
-    const date = new Date();
-    const time = date.getHours();
-    console.log(`Current hour: ${time}`);
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            // Update the UI with hourly weather data
-            const hourlyData = data.forecast.forecastday[0].hour;
-            // You can loop through hourlyData to display it as needed
-            hoursContainer.innerHTML = ''; // Clear previous hour data
-            for (let i = time; i < hourlyData.length; i++) {
-                const hourContainer = document.createElement('div.hour');
-                const hour = hourlyData[i];
-                if (hour.time.split(' ')[1].slice(0, 2) > 12) {
-                    hourContainer.innerHTML = `
-                        <h2>${hour.time.split(' ')[1].slice(0, 2) - 12} PM</h2>
-                        <img src="${hour.condition.icon}" alt="Weather Icon">
-                        <h3>${hour.temp_f.toFixed(0)}°</h3>
-                    `
-                } else if (hour.time.split(' ')[1].slice(0, 2) == 12) {
-                    hourContainer.innerHTML = `
-                        <h2>${hour.time.split(' ')[1].slice(0, 2)} PM</h2>
-                        <img src="${hour.condition.icon}" alt="Weather Icon">
-                        <h3>${hour.temp_f.toFixed(0)}°</h3>
-                    `
-                
-                } else {
-                    hourContainer.innerHTML = `
-                        <h2>${hour.time.split(' ')[1].slice(0, 2)} AM</h2>
-                        <img src="${hour.condition.icon}" alt="Weather Icon">
-                        <h3>${hour.temp_f.toFixed(0)}°</h3>
-                    `
-                }
-                
-                hourContainer.classList.add('hour');                
-                hoursContainer.appendChild(hourContainer);
-            }
+function updateCurrentWeather(data) {
+    cityName.textContent = data.location.name;
+    currentTemp.textContent = `${Math.round(data.current.temp_f)}°F`;
+    currentConditionImg.src = data.current.condition.icon;
+    humidityContainer.textContent = `${data.current.humidity}%`;
+    windSpeedContainer.textContent = `${Math.round(data.current.wind_mph)} mph`;
+    hourlyDate.textContent = formatDate();
+}
 
-        }
-    )
-    .catch(error => {
-        console.error('Error fetching hourly weather data:', error);
+function updateHourlyWeather(data) {
+    const currentHour = new Date().getHours();
+    const hourlyData = data.forecast.forecastday[0].hour;
+
+    hoursContainer.innerHTML = '';
+
+    hourlyData.slice(currentHour).forEach(hour => {
+        const hourEl = document.createElement('div');
+        hourEl.classList.add('hour');
+
+        const hourNumber = new Date(hour.time).getHours();
+
+        hourEl.innerHTML = `
+            <h2>${formatHour(hourNumber)}</h2>
+            <img src="${hour.condition.icon}" alt="Weather Icon">
+            <h3>${Math.round(hour.temp_f)}°</h3>
+            `;
+
+            hoursContainer.appendChild(hourEl);
+    })
+}
+
+function updateForecast(data) {
+    forecastContainer.innerHTML = '';
+
+    data.forecast.forecastday.forEach(day => {
+        const date = new Date(day.date);
+
+        const dayEl = document.createElement('div');
+        dayEl.classList.add('day');
+
+        dayEl.innerHTML = `
+            <h2>${date.toLocaleDateString('en-US', { weekday: 'short' })}</h2>
+            <img src="${day.day.condition.icon}" alt="Weather Icon">
+            <div class="temps">
+                <h3>${Math.round(day.day.maxtemp_f)}°</h3>
+                <h3>${Math.round(day.day.mintemp_f)}°</h3>
+            </div>
+        `;
+
+        forecastContainer.appendChild(dayEl);
+    })
+}
+
+function formatDate() {
+    return new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
     });
 }
 
-function getForecastData(city) {
-    const apiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&aqi=no&alerts=no&days=7`;
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            // Update the UI with forecast weather data
-            const forecastData = data.forecast.forecastday;
-            const daysOfTheWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            console.log(forecastData);
-            // You can loop through forecastData to display it as needed
-            const forecastContainer = document.querySelector('.days');
-            forecastContainer.innerHTML = ''; // Clear previous forecast data
-            forecastData.forEach(day => {
-                const dayContainer = document.createElement('div');
-                const date = new Date(day.date);
-                    dayContainer.classList.add('day');
-                    dayContainer.innerHTML = `
-                        <h2>${
-                            daysOfTheWeek[date.getDay() + 1]
-                        }</h2>
-                        <img src="${day.day.condition.icon}" alt="Weather Icon">
-                        <div class="temps">
-                            <h3>${day.day.maxtemp_f.toFixed(0)}°</h3>
-                            <h3>${day.day.mintemp_f.toFixed(0)}°</h3>
-                        </div>
-                    `;
-                    forecastContainer.appendChild(dayContainer);
-                }
-        )})
-        .catch(error => {
-            console.error('Error fetching forecast weather data:', error);
-        });
-}
-
-function getHumidity(city) {
-    const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=no`;
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            // Update the UI with humidity data
-            const humidity = data.current.humidity;
-            const humidityContainer = document.querySelector('.humidity-info h3');
-            humidityContainer.textContent = `${humidity}%`;
-        })
-        .catch(error => {
-            console.error('Error fetching humidity data:', error);
-        });
-}
-
-function getWindSpeed(city) {
-    const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=no`;
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            // Update the UI with wind speed data
-            const windSpeed = data.current.wind_mph.toFixed(0);
-            const windSpeedContainer = document.querySelector('.wind-info h3');
-            windSpeedContainer.textContent = `${windSpeed} mph`;
-        })
-        .catch(error => {
-            console.error('Error fetching wind speed data:', error);
-        });
+function formatHour(hour) {
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const adjustedHour = hour % 12 || 12;
+    return `${adjustedHour} ${period}`;
 }
