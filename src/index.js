@@ -38,7 +38,7 @@ function handleLocationError(error) {
 
 async function fetchWeatherData(city) {
     try {
-        const currentUrl = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=no`;
+        const currentUrl = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&days=2&aqi=no&alerts=no`;
         const forecastUrl = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&days=7&aqi=no&alerts=no`;
 
         const [currentRes, forecastRes] = await Promise.all([
@@ -68,11 +68,17 @@ function updateCurrentWeather(data) {
 
 function updateHourlyWeather(data) {
     const currentHour = new Date().getHours();
-    const hourlyData = data.forecast.forecastday[0].hour;
+    const todayHours = data.forecast.forecastday[0].hour;
+    const tomorrowHours = data.forecast.forecastday[1].hour;
+    const allHours = [...todayHours, ...tomorrowHours];
+    const startIndex = currentHour;
 
     hoursContainer.innerHTML = '';
+    hoursContainer.classList.remove('no-data');
 
-    hourlyData.slice(currentHour).forEach(hour => {
+    const next24Hours = allHours.slice(startIndex, startIndex + 24);
+
+    next24Hours.forEach(hour => {
         const hourEl = document.createElement('div');
         hourEl.classList.add('hour');
 
